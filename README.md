@@ -11,4 +11,17 @@ good luck, you'll need it
 what is this?
 =====
 
-quick paced isometric multiplayer rougelike duel
+quick paced isometric multiplayer rougelike duel (much local multiplayer wow)
+
+disclaimer
+=
+
+the block graphics come from an unknown google images source
+the stairs and obstacle graphics are the block graphic, but modified
+the player graphics are from the Open Bundle and are by Kenney
+
+doge version:
+
+much graphics
+such not ownership
+wow.
