@@ -3,11 +3,19 @@ obstacle = love.graphics.newImage("obstacle.png")
 stairs = love.graphics.newImage("stairsdown.png")
 stairsup = love.graphics.newImage("stairsup.png")
 sp = {160,20}
-players = {{floor=1,x=1,y=1,image=love.graphics.newImage("playera.png"),fall=0,velocity=5,rot=0},{floor=1,x=5,y=5,image=love.graphics.newImage("playerb.png"),fall=0,velocity=5,rot=0}}
+players = {{floor=1,x=1,y=1,image=love.graphics.newImage("playera.png"),fall=0,velocity=5,rot=0,falling=false},{floor=1,x=5,y=5,image=love.graphics.newImage("playerb.png"),fall=0,velocity=5,rot=0,falling=false}}
 map = {}
-mapSize = 20
+mapSize = 80
 prev = {1,1}
 started = false
+
+--[[
+Notes so far:
+> Deltatime compliant!
+> Works with any mapSize! (number of floors, over 500 works but is ill advised)
+> Two players! Could be expanded to 3! (four lags a bit)
+> Clusterfluffy source code! Fun Fun Fun!™
+]]
 
 function love.load()
 	for z=1,mapSize do
@@ -36,11 +44,11 @@ function love.load()
 	end
 	for i in pairs(players) do
 		map[players[i].floor][players[i].x][players[i].y]=1
-		players[i].fall=-2000
+		players[i].fall=-1000
 	end
-	-- for z=1,mapSize-1 do
-	-- 	map[z][3][4]=0 --FOR TESTING FALLING OK
-	-- end
+	for z=1,mapSize-1 do
+		map[z][3][4]=0 --FOR TESTING FALLING OK
+	end
 end
 
 --[[ NOTE TO SELF:
@@ -60,24 +68,27 @@ function love.draw()
 			for a=0,4 do
 				for x=1-a,5-a do
 					if map[z][x+a][a+1]>0 then
-						love.graphics.draw(block,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall,0,0.45,0.45) --yay maths!
-						if map[z][x+a][a+1]==2 then
-							love.graphics.draw(obstacle,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
-						elseif map[z][x+a][a+1]==6 then
-							love.graphics.draw(stairs,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
-						elseif map[z][x+a][a+1]==7 then
-						  love.graphics.draw(stairsup,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
+						if math.abs(players[i+1].floor-z)<4 then  --if the floor will appear on the screen then
+							love.graphics.draw(block,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall,0,0.45,0.45) --yay maths!
+							if map[z][x+a][a+1]==2 then
+								love.graphics.draw(obstacle,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
+							elseif map[z][x+a][a+1]==6 then
+								love.graphics.draw(stairs,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
+							elseif map[z][x+a][a+1]==7 then
+							  love.graphics.draw(stairsup,sp[1]+(x*40.5)+(i*500),sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+players[i+1].fall-44,0,0.45,0.45)
+							end
 						end
 						for k in pairs(players) do
+							love.graphics.circle("fill", 460+(k*20),((players[k].floor/mapSize)*800)-((players[k].fall/280)*(1/mapSize))*800-((mapSize^2)/200)+(mapSize/4)+10,5,4)
 							local col1,col2,col3,col4 = love.graphics.getColor()
 							local fal = 0
 							if k~=i+1 then fal=players[i+1].fall love.graphics.setColor(255,255,255,200) end
 							if players[k].x==x+a and players[k].y==a+1 and players[k].floor==z then
 								--I'm so sorry
 								love.graphics.draw(players[k].image,
-									sp[1]+(x*40.5)+(i*500)+15+players[i+1].image:getWidth()/2,
-									sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+fal+players[i+1].image:getHeight()/2-50,players[i+1].rot,
-									0.7,0.7,players[i+1].image:getWidth()/2,players[i+1].image:getHeight()/2)
+									sp[1]+(x*40.5)+(i*500)+48,
+									sp[2]+(x*24)+(a*48)+((z+3)*130)-(players[i+1].floor*130)-escalateAbove(i+1,z)+fal,players[k].rot,
+									0.7,0.7,players[k].image:getWidth()/2,players[k].image:getHeight()/2)
 							end
 							love.graphics.setColor(col1,col2,col3,col4)
 						end
@@ -88,17 +99,21 @@ function love.draw()
 	end
 end
 
-function love.update()
+function love.update(dt)
+	print(dt)
 	if not started then --starting animation
 		for i in pairs(players) do
-			players[i].fall=players[i].fall+20
-			if players[i].fall==0 then started=true end
+			players[i].fall=players[i].fall+400*dt
+			if players[i].fall>=0 then started=true end
 		end
 	else
 		for i in pairs(players) do
-			if players[i].fall~=0 then players[i].rot=players[i].rot+1 else players[i].rot=0 end
+			players[i].falling=false
+			if players[i].fall~=0 then players[i].falling=true end
+			if players[i].fall~=0 then players[i].rot=players[i].rot+200*dt else players[i].rot=0 end
 			if map[players[i].floor][players[i].x][players[i].y]==0 then
 				if players[i].floor<mapSize then
+					players[i].falling=true
 					if players[i].fall==0 then
 						players[i].floor=players[i].floor+1
 						if map[players[i].floor+1]~=nil then
@@ -109,15 +124,16 @@ function love.update()
 					end
 				end
 			end
+			if players[i].velocity~=0 then players[i].falling=true end
 			if players[i].fall==0 and map[players[i].floor][players[i].x][players[i].y]~=0 then players[i].velocity=0 end
 		end
 		for i in pairs(players) do --GRAVITY AND ANTIGRAVITY
 			if players[i].fall>0 then
 				players[i].fall=players[i].fall-players[i].velocity
-				players[i].velocity=players[i].velocity+0.5
+				players[i].velocity=players[i].velocity+10*dt
 			elseif players[i].fall<0 then
 				players[i].fall=players[i].fall+players[i].velocity
-				players[i].velocity=players[i].velocity+0.5
+				players[i].velocity=players[i].velocity+10*dt
 			end
 			if players[i].fall/players[i].velocity<1 then
 				players[i].fall=0
@@ -155,6 +171,7 @@ function love.keypressed(key)
 end
 
 function collision(player,x,y,z)
+	if players[player].falling then return true end
 	if map[z][x][y]==2 then return true end
 	if map[z][x][y]==6 then
 		players[player].floor=players[player].floor+1
@@ -173,6 +190,7 @@ function collision(player,x,y,z)
 			if x==players[p].x and y==players[p].y and z==players[p].floor then
 				return true
 			end
+		else if players[p].fall~=0 and map[players[p].floor][players[p].x][players[p].y]~=0 then return true end
 		end
 	end
 	return false
