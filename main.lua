@@ -1,9 +1,9 @@
-block = love.graphics.newImage("block.png")
-obstacle = love.graphics.newImage("obstacle.png")
-stairs = love.graphics.newImage("stairsdown.png")
-stairsup = love.graphics.newImage("stairsup.png")
+block = love.graphics.newImage("img/block.png")
+obstacle = love.graphics.newImage("img/obstacle.png")
+stairs = love.graphics.newImage("img/stairsdown.png")
+stairsup = love.graphics.newImage("img/stairsup.png")
 sp = {160,20}
-players = {{floor=1,x=1,y=1,image=love.graphics.newImage("playera.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100},{floor=1,x=5,y=5,image=love.graphics.newImage("playerb.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100}}
+players = {{floor=1,x=1,y=1,image=love.graphics.newImage("img/playera.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100},{floor=1,x=5,y=5,image=love.graphics.newImage("img/playerb.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100}}
 map = {}
 mapSize = 80
 prev = {1,1}
@@ -50,7 +50,6 @@ function love.load()
 	for z=1,mapSize-1 do
 		map[z][3][4]=0 --FOR TESTING FALLING OK
 	end
-	map[13][3][4]=1
 end
 
 --[[ NOTE TO SELF:
@@ -81,7 +80,7 @@ function love.draw()
 							end
 						end
 						for k in pairs(players) do
-							love.graphics.circle("fill", 460+(k*20),((players[k].floor/mapSize)*800)-((players[k].fall/280)*(1/mapSize))*800-((mapSize^2)/200)+(mapSize/4)+10,5,4)
+							love.graphics.circle("fill", 460+(k*20),((players[k].floor/mapSize)*750)-((players[k].fall/280)*(1/mapSize))*800-((mapSize^2)/200)+(mapSize/4)+20,5,4)
 							local col1,col2,col3,col4 = love.graphics.getColor()
 							local fal = 0
 							if k~=i+1 then fal=players[i+1].fall love.graphics.setColor(255,255,255,200) end
