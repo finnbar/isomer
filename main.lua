@@ -3,11 +3,12 @@ obstacle = love.graphics.newImage("obstacle.png")
 stairs = love.graphics.newImage("stairsdown.png")
 stairsup = love.graphics.newImage("stairsup.png")
 sp = {160,20}
-players = {{floor=1,x=1,y=1,image=love.graphics.newImage("playera.png"),fall=0,velocity=5,rot=0,falling=false},{floor=1,x=5,y=5,image=love.graphics.newImage("playerb.png"),fall=0,velocity=5,rot=0,falling=false}}
+players = {{floor=1,x=1,y=1,image=love.graphics.newImage("playera.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100},{floor=1,x=5,y=5,image=love.graphics.newImage("playerb.png"),fall=0,velocity=5,rot=0,falling=false,damaging=false,health=100}}
 map = {}
 mapSize = 80
 prev = {1,1}
 started = false
+cols = {{255,0,0},{0,255,0}}
 
 --[[
 Notes so far:
@@ -49,6 +50,7 @@ function love.load()
 	for z=1,mapSize-1 do
 		map[z][3][4]=0 --FOR TESTING FALLING OK
 	end
+	map[13][3][4]=1
 end
 
 --[[ NOTE TO SELF:
@@ -96,11 +98,14 @@ function love.draw()
 				end
 			end
 		end
+	love.graphics.setColor(cols[i+1][1],cols[i+1][2],cols[i+1][3],255)
+	love.graphics.rectangle("fill",500*i, 0, (players[i+1].health/100)*500, 10)
 	end
+	love.graphics.setColor(255,255,255,255)
+	love.graphics.print(love.timer.getAverageDelta(),900,12)
 end
 
 function love.update(dt)
-	print(dt)
 	if not started then --starting animation
 		for i in pairs(players) do
 			players[i].fall=players[i].fall+400*dt
@@ -108,6 +113,11 @@ function love.update(dt)
 		end
 	else
 		for i in pairs(players) do
+			players[i].health=players[i].health+dt
+			if players[i].health>100 then players[i].health=100 end
+			if players[i].health<=0 then
+				if i==1 then win(2) else win(1) end
+			end
 			players[i].falling=false
 			if players[i].fall~=0 then players[i].falling=true end
 			if players[i].fall~=0 then players[i].rot=players[i].rot+200*dt else players[i].rot=0 end
@@ -119,21 +129,27 @@ function love.update(dt)
 						if map[players[i].floor+1]~=nil then
 							if map[players[i].floor+1][players[i].x][players[i].y]==2 then map[players[i].floor+1][players[i].x][players[i].y]=1 end
 							players[i].fall=280
+							players[i].damaging=true
 							if players[i].velocity==0 then players[i].velocity=20 end
 						end
 					end
 				end
 			end
 			if players[i].velocity~=0 then players[i].falling=true end
-			if players[i].fall==0 and map[players[i].floor][players[i].x][players[i].y]~=0 then players[i].velocity=0 end
+			if players[i].fall==0 and map[players[i].floor][players[i].x][players[i].y]~=0 then 
+				if players[i].velocity~=0 then
+					if players[i].damaging then damage(i,players[i].velocity) end
+					players[i].velocity=0
+				end
+			end
 		end
 		for i in pairs(players) do --GRAVITY AND ANTIGRAVITY
 			if players[i].fall>0 then
 				players[i].fall=players[i].fall-players[i].velocity
-				players[i].velocity=players[i].velocity+10*dt
+				players[i].velocity=players[i].velocity+40*dt
 			elseif players[i].fall<0 then
 				players[i].fall=players[i].fall+players[i].velocity
-				players[i].velocity=players[i].velocity+10*dt
+				players[i].velocity=players[i].velocity+40*dt
 			end
 			if players[i].fall/players[i].velocity<1 then
 				players[i].fall=0
@@ -177,12 +193,14 @@ function collision(player,x,y,z)
 		players[player].floor=players[player].floor+1
 		players[player].fall=280
 		players[player].velocity=70
+		players[player].damaging=false
 		if map[z+1][x][y]==2 then map[z+1][x][y]=1 end
 	end
 	if map[z][x][y]==7 then
 		players[player].floor=players[player].floor-1
 		players[player].fall=-280
 		players[player].velocity=70
+		players[player].damaging=false
 		if map[z-1][x][y]==2 then map[z-1][x][y]=1 end
 	end
 	for p in pairs(players) do
@@ -194,4 +212,13 @@ function collision(player,x,y,z)
 		end
 	end
 	return false
+end
+
+function damage(player,damage)
+	print("player "..player.." took "..damage.." damage")
+	players[player].health=players[player].health-damage
+end
+
+function win(player)
+	print("player "..player.." wins! (this bit needs to be coded)")
 end
