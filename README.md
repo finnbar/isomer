@@ -7,6 +7,8 @@ ha you have to read the source code lol
 ======
 
 good luck, you'll need it
+<br />
+ok it's a little better now that it's written in moonscript
 
 what is this?
 =====

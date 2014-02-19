@@ -1,5 +1,5 @@
-function love.conf(t)
-	t.window.height=800
-	t.window.width=1000
-	t.title="The Isomer Project"
+love.conf = function(t)
+  t.window.title = "The Isomer Project"
+  t.window.height = 800
+  t.window.width = 1000
 end
