@@ -1,12 +1,10 @@
---problèmes (where the problems go):
---falling is jerky, mainly requires little bits of smoothing
-
 import newImage,draw,setColor,getColor,rectangle,circle from love.graphics
 import random from love.math
-import insert from table
-import abs from math
+import insert,remove from table
+import abs,ceil from math
 
 export playerImages = {newImage("img/playera.png"),newImage("img/playerb.png")}
+export weaponImages = {shotgun: newImage("img/shotgunAmmo.png")}
 block = newImage "img/block.png"
 obstacle = newImage "img/obstacle.png"
 stairs = newImage "img/stairsdown.png"
@@ -16,6 +14,8 @@ winImg,loseImg = newImage("img/win.png"),newImage("img/lose.png")
 bgData = bg\getData!
 export players = {}
 export collects = {}
+export weapons = {}
+export dTotal=0
 choppyPixels = {}
 export sp = {160,20}
 export map = {}
@@ -106,6 +106,9 @@ love.draw = ->
 							when 7 then draw stairsup,getBlockX(x,i),getBlockY(z,x,a,i+1)-44,0,0.45,0.45
 						if collects[z][x+a][a+1]==1
 							draw obstacle,getBlockX(x,i)+20,getBlockY(z,x,a,i+1)-22,0,0.25,0.25
+						for _,v in pairs weapons
+							if ceil(v.floor)==z and ceil(v.x)==x+a and ceil(v.y)==a+1
+								draw weaponImages[v.owner.equip.__name],getBlockX(x,i),getBlockY(z,x,a,i+1)-v.above,0,0.1,0.1
 						for k in pairs players
 							col1,col2,col3,col4 = getColor!
 							setColor 0,0,0
@@ -149,6 +152,13 @@ love.update = ->
 		for _,v in pairs players
 			v\sustain!
 			v\physics!
+		if dTotal>0.3
+			export dTotal=0
+			for i,v in pairs weapons
+				if not v\run!
+					remove weapons,i
+		else
+			dTotal+=dt
 
 --keypressed/released DEFINITELY WORKS
 love.keypressed = (key) ->
@@ -165,3 +175,31 @@ export tableContains = (table,val) ->
 	for i,v in pairs table
 		return i if v==val
 	return false
+
+love.quit = -> --cleanup
+	print "merci"
+	newImage,draw,setColor,getColor,rectangle,circle=nil,nil,nil,nil,nil,nil
+	random=nil
+	insert=nil
+	abs=nil
+	export playerImages = nil
+	block = nil
+	obstacle = nil
+	stairs = nil
+	stairsup = nil
+	bg = nil
+	winImg,loseImg = nil,nil
+	bgData = nil
+	export players = nil
+	export collects = nil
+	export weapons = nil
+	choppyPixels = nil
+	export sp = nil
+	export map = nil
+	export mapSize = nil
+	prev = nil
+	started = nil
+	cols = nil
+	death = nil
+	deathX,deathY = nil,nil
+	export dt = nil

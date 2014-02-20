@@ -99,6 +99,14 @@ do
               self.x = self.x + 1
               self.facing = "right"
             end
+          elseif 5 == _exp_0 then
+            if type(self.equip) ~= "number" then
+              if self.equip.ammo > 0 then
+                self.equip.ammo = self.equip.ammo - 1
+                insert(weapons, self:equip())
+                weapons[#weapons]:begin(self)
+              end
+            end
           end
         end
       end

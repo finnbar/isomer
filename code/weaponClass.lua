@@ -3,6 +3,11 @@ do
   local _obj_0 = love.math
   random = _obj_0.random
 end
+local ceil
+do
+  local _obj_0 = math
+  ceil = _obj_0.ceil
+end
 newWeaponBox = function()
   return weaponsList[random(1, #weaponsList)]
 end
@@ -12,7 +17,11 @@ do
       self.owner = player
       self.gravity = 2
       self.floor = player.floor
-      local _exp_0 = self.facing
+      self.x = 0
+      self.y = 0
+      self.xVel = 0
+      self.yVel = 0
+      local _exp_0 = player.facing
       if "left" == _exp_0 then
         self.x = player.x - 1
         self.y = player.y
@@ -36,11 +45,50 @@ do
       end
       self.above = 20
       self.zVel = 0.5
+    end,
+    run = function(self)
+      self.x = self.x + self.xVel
+      self.y = self.y + self.yVel
+      self.xVel = self.xVel - (self.xVel * self.drag)
+      self.yVel = self.yVel - (self.yVel * self.drag)
+      self.zVel = self.zVel + self.gravity
+      self.above = self.above - self.zVel
+      self.damage = ((self.xVel + self.yVel + self.zVel) / 3) * 8
+      if not self:collision() then
+        return false
+      end
+      if self.above < 0 then
+        self.floor = self.floor + 1
+        self.above = 280 - self.above
+      end
+      return true
+    end,
+    collision = function(self)
+      if self.x > 5 or self.x < 1 or self.y < 1 or self.x > 5 or self.floor < 1 or self.floor > mapSize then
+        return false
+      end
+      if self.above < 20 and map[ceil(self.floor)][ceil(self.x)][ceil(self.y)] ~= 0 then
+        print(self.damage)
+        if self.damage > 2 then
+          map[ceil(self.floor)][ceil(self.x)][ceil(self.y)] = 0
+          self.xVel = self.xVel / 2
+          self.yVel = self.yVel / 2
+          self.zVel = self.zVel / 2
+        else
+          return false
+        end
+      end
+      return true
     end
   }
   _base_0.__index = _base_0
   local _class_0 = setmetatable({
-    __init = function() end,
+    __init = function(self)
+      self.x = 0
+      self.y = 0
+      self.xVel = 0
+      self.yVel = 0
+    end,
     __base = _base_0,
     __name = "weapon"
   }, {
@@ -58,30 +106,18 @@ do
   local _parent_0 = weapon
   local _base_0 = {
     ammo = 5,
-    run = function(self)
-      self.x = self.x + self.xVel
-      self.y = self.y + self.yVel
-      self.xVel = self.xVel - (self.xVel * self.drag)
-      self.yVel = self.yVel - (self.yVel * self.drag)
-      self.zVel = self.zVel + self.gravity
-      self.above = self.above - self.zVel
-      if not self:collision() then
-        self = nil
-      end
-      if self.above < 0 then
-        self.floor = self.floor + 1
-        self.above = 280 - self.above
-      end
-    end,
-    collision = function(self) end
+    begin = function(self, player)
+      self:inherit(player)
+      self.drag = 0.2
+      self.above = 60
+      self.damage = ((self.xVel + self.yVel + self.zVel) / 3) * 8
+    end
   }
   _base_0.__index = _base_0
   setmetatable(_base_0, _parent_0.__base)
   local _class_0 = setmetatable({
-    __init = function(self, player)
-      self:inherit(player)
-      self.drag = 0.2
-      self.damage = ((self.xVel + self.yVel + self.zVel) / 3) * 8
+    __init = function(self, ...)
+      return _parent_0.__init(self, ...)
     end,
     __base = _base_0,
     __name = "shotgun",

@@ -8,19 +8,22 @@ do
   local _obj_0 = love.math
   random = _obj_0.random
 end
-local insert
+local insert, remove
 do
   local _obj_0 = table
-  insert = _obj_0.insert
+  insert, remove = _obj_0.insert, _obj_0.remove
 end
-local abs
+local abs, ceil
 do
   local _obj_0 = math
-  abs = _obj_0.abs
+  abs, ceil = _obj_0.abs, _obj_0.ceil
 end
 playerImages = {
   newImage("img/playera.png"),
   newImage("img/playerb.png")
+}
+weaponImages = {
+  shotgun = newImage("img/shotgunAmmo.png")
 }
 local block = newImage("img/block.png")
 local obstacle = newImage("img/obstacle.png")
@@ -31,6 +34,8 @@ local winImg, loseImg = newImage("img/win.png"), newImage("img/lose.png")
 local bgData = bg:getData()
 players = { }
 collects = { }
+weapons = { }
+dTotal = 0
 local choppyPixels = { }
 sp = {
   160,
@@ -181,6 +186,11 @@ love.draw = function()
             if collects[z][x + a][a + 1] == 1 then
               draw(obstacle, getBlockX(x, i) + 20, getBlockY(z, x, a, i + 1) - 22, 0, 0.25, 0.25)
             end
+            for _, v in pairs(weapons) do
+              if ceil(v.floor) == z and ceil(v.x) == x + a and ceil(v.y) == a + 1 then
+                draw(weaponImages[v.owner.equip.__name], getBlockX(x, i), getBlockY(z, x, a, i + 1) - v.above, 0, 0.1, 0.1)
+              end
+            end
             for k in pairs(players) do
               local col1, col2, col3, col4 = getColor()
               setColor(0, 0, 0)
@@ -232,6 +242,16 @@ love.update = function()
       v:sustain()
       v:physics()
     end
+    if dTotal > 0.3 then
+      dTotal = 0
+      for i, v in pairs(weapons) do
+        if not v:run() then
+          remove(weapons, i)
+        end
+      end
+    else
+      dTotal = dTotal + dt
+    end
   end
 end
 love.keypressed = function(key)
@@ -255,4 +275,32 @@ tableContains = function(table, val)
     end
   end
   return false
+end
+love.quit = function()
+  print("merci")
+  newImage, draw, setColor, getColor, rectangle, circle = nil, nil, nil, nil, nil, nil
+  random = nil
+  insert = nil
+  abs = nil
+  playerImages = nil
+  block = nil
+  obstacle = nil
+  stairs = nil
+  stairsup = nil
+  bg = nil
+  winImg, loseImg = nil, nil
+  bgData = nil
+  players = nil
+  collects = nil
+  weapons = nil
+  choppyPixels = nil
+  sp = nil
+  map = nil
+  mapSize = nil
+  prev = nil
+  started = nil
+  cols = nil
+  death = nil
+  deathX, deathY = nil, nil
+  dt = nil
 end

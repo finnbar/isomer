@@ -60,7 +60,7 @@ export class player
 				@equip=newWeaponBox!
 				collects[@floor][@x][@y]=0
 	movement: (key) =>
-		--first, check for keypresses and do stuff
+		--check for keypresses and do stuff
 		for i,v in pairs @keys
 			if key==v
 				switch i
@@ -80,6 +80,13 @@ export class player
 						if @x<5 and not collision(@id,@x+1,@y,@floor)
 							@x+=1
 							@facing="right"
+					when 5
+						if type(@equip)~="number"
+							if @equip.ammo>0
+								@equip.ammo-=1
+								insert weapons,@equip!
+								--error: no xVel etc., maybe wrong scope?
+								weapons[#weapons]\begin @
 
 export collision = (id,x,y,z) ->
 	return true if players[id].falling
