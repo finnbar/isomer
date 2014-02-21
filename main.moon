@@ -3,8 +3,10 @@ import random from love.math
 import insert,remove from table
 import abs,ceil from math
 
+tempAmmo=newImage "img/shotgunAmmo.png"
+
 export playerImages = {newImage("img/playera.png"),newImage("img/playerb.png")}
-export weaponImages = {shotgun: newImage("img/shotgunAmmo.png")}
+export weaponImages = {shotgun: newImage("img/shotgunAmmo.png"), drill: tempAmmo}
 block = newImage "img/block.png"
 obstacle = newImage "img/obstacle.png"
 stairs = newImage "img/stairsdown.png"
@@ -108,7 +110,7 @@ love.draw = ->
 							draw obstacle,getBlockX(x,i)+20,getBlockY(z,x,a,i+1)-22,0,0.25,0.25
 						for _,v in pairs weapons
 							if ceil(v.floor)==z and ceil(v.x)==x+a and ceil(v.y)==a+1
-								draw weaponImages[v.owner.equip.__name],getBlockX(x,i),getBlockY(z,x,a,i+1)-v.above,0,0.1,0.1
+								draw weaponImages[v.owner.equip.__name],getBlockX(x,i)+20,getBlockY(z,x,a,i+1)-v.above,0,0.1,0.1
 						for k in pairs players
 							col1,col2,col3,col4 = getColor!
 							setColor 0,0,0
@@ -152,15 +154,10 @@ love.update = ->
 		for _,v in pairs players
 			v\sustain!
 			v\physics!
-		if dTotal>0.3
-			export dTotal=0
-			for i,v in pairs weapons
-				if not v\run!
-					remove weapons,i
-		else
-			dTotal+=dt
+		for i,v in pairs weapons
+			if not v\run!
+				remove weapons,i
 
---keypressed/released DEFINITELY WORKS
 love.keypressed = (key) ->
 	for _,v in pairs players
 		v\movement key

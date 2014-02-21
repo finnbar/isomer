@@ -9,10 +9,13 @@ do
       if self.health < 100 then
         self.health = self.health + dt
       end
+      print(self.id, self.losingHealth)
       if self.losingHealth > 10 then
         self.health = self.health - 10
+        self.losingHealth = self.losingHealth - 10
       else
         self.health = self.health - self.losingHealth
+        self.losingHealth = 0
       end
       if self.health <= 0 then
         if self.id == 2 then
@@ -54,7 +57,7 @@ do
       end
       if self.fall == 0 and map[self.floor][self.x][self.y] ~= 0 and self.velocity ~= 0 then
         if self.damaging then
-          self.losingHealth = self.losingHealth + self.velocity
+          self.losingHealth = self.losingHealth + (self.velocity / 2)
         end
         self.velocity = 0
       end

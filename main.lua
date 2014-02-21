@@ -18,12 +18,14 @@ do
   local _obj_0 = math
   abs, ceil = _obj_0.abs, _obj_0.ceil
 end
+local tempAmmo = newImage("img/shotgunAmmo.png")
 playerImages = {
   newImage("img/playera.png"),
   newImage("img/playerb.png")
 }
 weaponImages = {
-  shotgun = newImage("img/shotgunAmmo.png")
+  shotgun = newImage("img/shotgunAmmo.png"),
+  drill = tempAmmo
 }
 local block = newImage("img/block.png")
 local obstacle = newImage("img/obstacle.png")
@@ -188,7 +190,7 @@ love.draw = function()
             end
             for _, v in pairs(weapons) do
               if ceil(v.floor) == z and ceil(v.x) == x + a and ceil(v.y) == a + 1 then
-                draw(weaponImages[v.owner.equip.__name], getBlockX(x, i), getBlockY(z, x, a, i + 1) - v.above, 0, 0.1, 0.1)
+                draw(weaponImages[v.owner.equip.__name], getBlockX(x, i) + 20, getBlockY(z, x, a, i + 1) - v.above, 0, 0.1, 0.1)
               end
             end
             for k in pairs(players) do
@@ -242,15 +244,10 @@ love.update = function()
       v:sustain()
       v:physics()
     end
-    if dTotal > 0.3 then
-      dTotal = 0
-      for i, v in pairs(weapons) do
-        if not v:run() then
-          remove(weapons, i)
-        end
+    for i, v in pairs(weapons) do
+      if not v:run() then
+        remove(weapons, i)
       end
-    else
-      dTotal = dTotal + dt
     end
   end
 end

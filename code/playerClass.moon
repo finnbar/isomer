@@ -19,10 +19,13 @@ export class player
 		@equip=0
 	sustain: =>  --has player sustained health??? yes I was running out of name ideas
 		@health+=dt if @health<100
+		print @id,@losingHealth
 		if @losingHealth>10
 			@health-=10
+			@losingHealth-=10
 		else
 			@health-=@losingHealth
+			@losingHealth=0
 		if @health<=0  --currently only for 2 players, needs MOAR
 			win 1 if @id==2
 			win 2 if @id==1
@@ -45,7 +48,7 @@ export class player
 						@velocity=20 if @velocity==0
 		@falling=true if @velocity~=0
 		if @fall==0 and map[@floor][@x][@y]~=0 and @velocity~=0
-			@losingHealth+=@velocity if @damaging
+			@losingHealth+=(@velocity/2) if @damaging
 			@velocity=0
 		if @fall>0
 			@fall-=@velocity
