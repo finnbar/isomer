@@ -19,7 +19,7 @@ export class player
 		@equip=0
 	sustain: =>  --has player sustained health??? yes I was running out of name ideas
 		@health+=dt if @health<100
-		print @id,@losingHealth
+		--print @id,@losingHealth
 		if @losingHealth>10
 			@health-=10
 			@losingHealth-=10
@@ -60,6 +60,7 @@ export class player
 				@fall=0
 		if @fall==0 and not @falling
 			if collects[@floor][@x][@y]==1
+				@equip=nil --clear it
 				@equip=newWeaponBox!
 				collects[@floor][@x][@y]=0
 	movement: (key) =>

@@ -9,7 +9,6 @@ do
       if self.health < 100 then
         self.health = self.health + dt
       end
-      print(self.id, self.losingHealth)
       if self.losingHealth > 10 then
         self.health = self.health - 10
         self.losingHealth = self.losingHealth - 10
@@ -73,6 +72,7 @@ do
       end
       if self.fall == 0 and not self.falling then
         if collects[self.floor][self.x][self.y] == 1 then
+          self.equip = nil
           self.equip = newWeaponBox()
           collects[self.floor][self.x][self.y] = 0
         end

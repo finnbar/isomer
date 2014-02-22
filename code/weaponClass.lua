@@ -69,7 +69,7 @@ do
       if self.x > 5 or self.x < 1 or self.y < 1 or self.x > 5 or self.floor < 1 or self.floor > mapSize then
         return false
       end
-      if self.above < 20 and map[ceil(self.floor)][ceil(self.x)][ceil(self.y)] ~= 0 then
+      if self.above < 10 and map[ceil(self.floor)][ceil(self.x)][ceil(self.y)] ~= 0 then
         if self.damage > 2 then
           map[ceil(self.floor)][ceil(self.x)][ceil(self.y)] = 0
           self.xVel = self.xVel / 2
@@ -77,6 +77,13 @@ do
           self.zVel = self.zVel / 2
           self.damageMulti = self.damageMulti / 2
         else
+          return false
+        end
+      end
+      for i, v in pairs(players) do
+        if v.x == ceil(self.x) and v.y == ceil(self.y) and v.floor == self.floor then
+          print("player " .. tostring(i) .. " was hit!")
+          players[i].losingHealth = self.damage
           return false
         end
       end
@@ -107,13 +114,14 @@ end
 do
   local _parent_0 = weapon
   local _base_0 = {
-    ammo = 5,
     begin = function(self, player)
+      self.ammo = 5
       self:inherit(player)
       self.drag = 0.2
       self.above = 60
       self.damage = ((self.xVel + self.yVel + self.zVel) / 3) * self.damageMulti
     end,
+    ammo = 5,
     extras = function(self)
       return true
     end
@@ -151,8 +159,8 @@ end
 do
   local _parent_0 = weapon
   local _base_0 = {
-    ammo = 3,
     begin = function(self, player)
+      self.ammo = 3
       self:inherit(player)
       self.damageMulti = 4
       self.drag = 0
@@ -162,6 +170,7 @@ do
       self.yVel = 0
       self.damage = ((self.xVel + self.yVel + self.zVel) / 3) * self.damageMulti
     end,
+    ammo = 3,
     extras = function(self)
       return true
     end

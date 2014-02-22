@@ -1,3 +1,5 @@
+-- THE ENTIRE ENGINE, INCLUDING DRAWING, IS NOW DELTATIME COMPLIANT!
+
 import newImage,draw,setColor,getColor,rectangle,circle from love.graphics
 import random from love.math
 import insert,remove from table
@@ -49,7 +51,9 @@ love.load = ->
 	for z=1,mapSize-1,1
 		x,y=2,2
 		while 1
+			print "loading (1)"  --check for overflow/infinite loop
 			while 1
+				print "loading (2)"
 				x,y = random(1,5),random(1,5)
 				if not ((x==1 and y==1) or (x==1 and y==5) or (x==5 and y==1) or (x==5 and y==5))
 					break
@@ -63,12 +67,12 @@ love.load = ->
 		v.fall=-1000
 	for z=1,mapSize-1
 		map[z][3][4]=0
-	for i=1,mapSize
-		while 1 do
-			x,y=random(1,5),random(1,5)
-			if map[i][x][y]==1	
-				collects[i][x][y]=1
-				break
+	for i=1,mapSize-1
+		x,y=random(1,5),random(1,5)
+		collects[i][x][y]=1
+		if map[i][x][y]==2
+			collects[i][x][y]=0
+			collects[i+1][x][y]=0
 
 love.draw = ->
 	avg,favg,n = 0,0,0
@@ -110,7 +114,7 @@ love.draw = ->
 							draw obstacle,getBlockX(x,i)+20,getBlockY(z,x,a,i+1)-22,0,0.25,0.25
 						for _,v in pairs weapons
 							if ceil(v.floor)==z and ceil(v.x)==x+a and ceil(v.y)==a+1
-								draw weaponImages[v.owner.equip.__name],getBlockX(x,i)+20,getBlockY(z,x,a,i+1)-v.above,0,0.1,0.1
+								draw weaponImages[v.owner.equip.__name],getBlockX(v.x-v.y+1,i),getBlockY(z,v.x-v.y+1,v.y-0.5,i+1)-v.above,0,0.1,0.1 --smoothed!
 						for k in pairs players
 							col1,col2,col3,col4 = getColor!
 							setColor 0,0,0
@@ -173,30 +177,5 @@ export tableContains = (table,val) ->
 		return i if v==val
 	return false
 
-love.quit = -> --cleanup
+love.quit = -> --was cleanup, no longer needed
 	print "merci"
-	newImage,draw,setColor,getColor,rectangle,circle=nil,nil,nil,nil,nil,nil
-	random=nil
-	insert=nil
-	abs=nil
-	export playerImages = nil
-	block = nil
-	obstacle = nil
-	stairs = nil
-	stairsup = nil
-	bg = nil
-	winImg,loseImg = nil,nil
-	bgData = nil
-	export players = nil
-	export collects = nil
-	export weapons = nil
-	choppyPixels = nil
-	export sp = nil
-	export map = nil
-	export mapSize = nil
-	prev = nil
-	started = nil
-	cols = nil
-	death = nil
-	deathX,deathY = nil,nil
-	export dt = nil

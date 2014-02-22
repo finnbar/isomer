@@ -64,7 +64,7 @@ export class weapon  --main class, here pretty much just for inheritance
 		return true
 	collision: =>  --seems to not be running? or it returns false verrrryyy quickly
 		return false if @x>5 or @x<1 or @y<1 or @x>5 or @floor<1 or @floor>mapSize
-		if @above<20 and map[ceil @floor][ceil @x][ceil @y]~=0
+		if @above<10 and map[ceil @floor][ceil @x][ceil @y]~=0
 			if @damage>2  --needs to be replaced with a call to a Block class, extended by type, or even just a reference table
 				map[ceil @floor][ceil @x][ceil @y]=0
 				@xVel/=2
@@ -72,23 +72,29 @@ export class weapon  --main class, here pretty much just for inheritance
 				@zVel/=2
 				@damageMulti/=2
 			else return false
+		for i,v in pairs players
+			if v.x==ceil(@x) and v.y==ceil(@y) and v.floor==@floor
+				print "player #{i} was hit!"
+				players[i].losingHealth=@damage
+				return false
 		return true --should be at end
 		--check to see if a block is hit, (if @above<0 deal damage), subtract damage and dramatically subtract from x y z velocities, if damage is too low or x+y+z==0 then return false and kill this weapon (set to nil)
 
 export class shotgun extends weapon
-	ammo: 5 --decrease on shot, please
 	begin: (player) =>
+		@ammo=5
 		@inherit player
 		--xVel,yVels are fine, should only be changed for drills and other stuff™
 		@drag=0.2
 		@above=60
 		@damage=((@xVel+@yVel+@zVel)/3)*@damageMulti --should change, check per frame
+	ammo: 5
 	extras: =>
 		return true --nothing yet
 
 export class drill extends weapon
-	ammo: 3
 	begin: (player) =>
+		@ammo=3
 		@inherit player
 		@damageMulti=4
 		@drag=0
@@ -96,7 +102,8 @@ export class drill extends weapon
 		@zVel=20
 		@xVel=0
 		@yVel=0
-		@damage=((@xVel+@yVel+@zVel)/3)*@damageMulti --should change, check per frame
+		@damage=((@xVel+@yVel+@zVel)/3)*@damageMulti --should change, check per frame-
+	ammo: 3
 	extras: =>
 		return true --nothing yet
 

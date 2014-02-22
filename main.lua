@@ -99,7 +99,9 @@ love.load = function()
   for z = 1, mapSize - 1, 1 do
     local x, y = 2, 2
     while 1 do
+      print("loading (1)")
       while 1 do
+        print("loading (2)")
         x, y = random(1, 5), random(1, 5)
         if not ((x == 1 and y == 1) or (x == 1 and y == 5) or (x == 5 and y == 1) or (x == 5 and y == 5)) then
           break
@@ -123,13 +125,12 @@ love.load = function()
   for z = 1, mapSize - 1 do
     map[z][3][4] = 0
   end
-  for i = 1, mapSize do
-    while 1 do
-      local x, y = random(1, 5), random(1, 5)
-      if map[i][x][y] == 1 then
-        collects[i][x][y] = 1
-        break
-      end
+  for i = 1, mapSize - 1 do
+    local x, y = random(1, 5), random(1, 5)
+    collects[i][x][y] = 1
+    if map[i][x][y] == 2 then
+      collects[i][x][y] = 0
+      collects[i + 1][x][y] = 0
     end
   end
 end
@@ -190,7 +191,7 @@ love.draw = function()
             end
             for _, v in pairs(weapons) do
               if ceil(v.floor) == z and ceil(v.x) == x + a and ceil(v.y) == a + 1 then
-                draw(weaponImages[v.owner.equip.__name], getBlockX(x, i) + 20, getBlockY(z, x, a, i + 1) - v.above, 0, 0.1, 0.1)
+                draw(weaponImages[v.owner.equip.__name], getBlockX(v.x - v.y + 1, i), getBlockY(z, v.x - v.y + 1, v.y - 0.5, i + 1) - v.above, 0, 0.1, 0.1)
               end
             end
             for k in pairs(players) do
@@ -274,30 +275,5 @@ tableContains = function(table, val)
   return false
 end
 love.quit = function()
-  print("merci")
-  newImage, draw, setColor, getColor, rectangle, circle = nil, nil, nil, nil, nil, nil
-  random = nil
-  insert = nil
-  abs = nil
-  playerImages = nil
-  block = nil
-  obstacle = nil
-  stairs = nil
-  stairsup = nil
-  bg = nil
-  winImg, loseImg = nil, nil
-  bgData = nil
-  players = nil
-  collects = nil
-  weapons = nil
-  choppyPixels = nil
-  sp = nil
-  map = nil
-  mapSize = nil
-  prev = nil
-  started = nil
-  cols = nil
-  death = nil
-  deathX, deathY = nil, nil
-  dt = nil
+  return print("merci")
 end
